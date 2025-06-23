@@ -13,11 +13,6 @@ struct Attribute {
 }
 
 struct Part {
-  PartKind kind;
+  bytes2 kind;
   bytes data;
-}
-
-enum PartKind {
-  Raw,
-  Pointer
 }
