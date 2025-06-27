@@ -3,74 +3,94 @@ pragma solidity ^0.8.24;
 
 type Stream is uint256;
 
-struct Chunk {
-  bytes2 kind;
-  bytes data;
+using { concat as +, map, toString } for Stream global;
+
+function s(string memory contents) pure returns (Stream stream) {
+  _Stream memory _stream;
+  _stream.chunks = new _Chunk[](1);
+  _stream.chunks[0] = _Chunk("by", bytes(contents).length, bytes(contents));
+  _stream.length = _stream.chunks[0].length;
+  return _wrap(_stream);
 }
 
-function s(string memory str) pure returns (Stream stream) {
-  Chunk[] memory chunks = new Chunk[](1);
-  chunks[0] = Chunk("bs", bytes(str));
-  return from(chunks);
+function bytecode(address location) pure returns (Stream stream) {
+  return bytecode(location, 0, 0);
 }
 
-function bytecode(address addr) pure returns (Stream stream) {
-  return bytecode(addr, 0, 0);
+function bytecode(address location, uint256 start) pure returns (Stream stream) {
+  return bytecode(location, start, 0);
 }
 
-function bytecode(address addr, uint256 start) pure returns (Stream stream) {
-  return bytecode(addr, start, 0);
-}
-
-function bytecode(address addr, uint256 start, uint256 end) pure returns (Stream stream) {
-  Chunk[] memory chunks = new Chunk[](1);
-  chunks[0] = Chunk("bc", abi.encode(addr, start, end));
-  return from(chunks);
+function bytecode(address location, uint256 start, uint256 end) pure returns (Stream stream) {
+  _Stream memory _stream;
+  _stream.chunks = new _Chunk[](1);
+  _stream.chunks[0] = _Chunk("bc", end > start ? end - start : 0, abi.encode(location, start, end));
+  _stream.length = _stream.chunks[0].length;
+  return _wrap(_stream);
 }
 
 function concat(Stream left, Stream right) pure returns (Stream stream) {
-  Chunk[] memory a = asChunks(left);
-  Chunk[] memory b = asChunks(right);
+  _Stream memory a = _unwrap(left);
+  _Stream memory b = _unwrap(right);
 
-  uint256 lenA = a.length;
-  uint256 lenB = b.length;
-  uint256 total = lenA + lenB;
+  _Chunk[] memory chunks = new _Chunk[](a.chunks.length + b.chunks.length);
 
-  Chunk[] memory chunks = new Chunk[](total);
-
-  for (uint256 i = 0; i < lenA; i++) {
-    chunks[i] = a[i];
+  for (uint256 i = 0; i < a.chunks.length; i++) {
+    chunks[i] = a.chunks[i];
   }
-  for (uint256 i = 0; i < lenB; i++) {
-    chunks[lenA + i] = b[i];
+  for (uint256 i = 0; i < b.chunks.length; i++) {
+    chunks[a.chunks.length + i] = b.chunks[i];
   }
 
-  return from(chunks);
+  return _wrap(_Stream(a.length + b.length, chunks));
 }
 
-function map(Stream stream, function(bytes2, bytes memory) view returns (bytes2, bytes memory) callback)
+function map(
+  Stream stream,
+  function(bytes2, uint256, bytes memory) view returns (bytes2, uint256, bytes memory) transform
+) view returns (Stream) {
+  _Stream memory _stream = _unwrap(stream);
+  for (uint256 i = 0; i < _stream.chunks.length; i++) {
+    (bytes2 kind, uint256 length, bytes memory data) =
+      transform(_stream.chunks[i].kind, _stream.chunks[i].length, _stream.chunks[i].data);
+    _stream.chunks[i].kind = kind;
+    _stream.chunks[i].length = length;
+    _stream.chunks[i].data = data;
+  }
+  return _wrap(_stream);
+}
+
+function toString(Stream stream, function(bytes2, uint256, bytes memory) view returns (string memory) transform)
   view
-  returns (Stream)
+  returns (string memory out)
 {
-  Chunk[] memory chunks = asChunks(stream);
-  for (uint256 i = 0; i < chunks.length; i++) {
-    (bytes2 kind, bytes memory data) = callback(chunks[i].kind, chunks[i].data);
-    chunks[i].kind = kind;
-    chunks[i].data = data;
-  }
-  return from(chunks);
-}
-
-using { concat as +, map } for Stream global;
-
-function asChunks(Stream stream) pure returns (Chunk[] memory chunks) {
-  assembly {
-    chunks := stream
+  _Stream memory _stream = _unwrap(stream);
+  for (uint256 i = 0; i < _stream.chunks.length; i++) {
+    out = string.concat(out, transform(_stream.chunks[i].kind, _stream.chunks[i].length, _stream.chunks[i].data));
   }
 }
 
-function from(Chunk[] memory chunks) pure returns (Stream stream) {
+//--------------------//  INTERNAL  //--------------------//
+
+struct _Stream {
+  uint256 length;
+  _Chunk[] chunks;
+}
+
+struct _Chunk {
+  bytes2 kind;
+  uint256 length;
+  bytes data;
+}
+
+function _unwrap(Stream stream) pure returns (_Stream memory _stream) {
   assembly {
-    stream := chunks
+    _stream := stream
+  }
+}
+
+function _wrap(_Stream memory _stream) pure returns (Stream stream) {
+  assembly {
+    stream := _stream
   }
 }
