@@ -27,6 +27,7 @@ function buildString(Stream stream, function(bytes2, uint256, bytes memory) view
 {
   DynamicBufferLib.DynamicBuffer memory buffer;
   _Stream memory _stream = _unwrap(stream);
+  buffer.reserve(_stream.length);
   for (uint256 i = 0; i < _stream.chunks.length; i++) {
     buffer.p(bytes(transform(_stream.chunks[i].kind, _stream.chunks[i].length, _stream.chunks[i].data)));
   }
