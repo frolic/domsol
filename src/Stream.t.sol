@@ -23,7 +23,7 @@ contract StreamTest is Test {
   function testTokenURI() public {
     address script = SSTORE2.write(bytes(Base64.encode('alert("hello world")')));
 
-    Stream page = s('<script src="data:text/javascript;base64,') + bytecode(script) + s('"></script>');
+    Stream page = s('<script src="data:text/javascript;base64,') + bytecode(script, 1) + s('"></script>');
     Stream metadata = s('{"name":"Token","animation_url":"data:text/html,') + page.encodeURI() + s('"}');
     Stream uri = s("data:application/json,") + metadata.encodeURI();
 

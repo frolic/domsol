@@ -5,7 +5,6 @@ import "forge-std/Test.sol";
 
 import { Base64 } from "domsol-solady/utils/Base64.sol";
 import { LibString } from "domsol-solady/utils/LibString.sol";
-import { SSTORE2 } from "domsol-solady/utils/SSTORE2.sol";
 
 import { File } from "ethfs/src/File.sol";
 import { FileStore } from "ethfs/src/FileStore.sol";
