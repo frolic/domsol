@@ -1,9 +1,11 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
 
+import { encodeURI, toString } from "./transforms.sol";
+
 type Stream is uint256;
 
-using { concat as +, map, toString } for Stream global;
+using { concat as +, encodeURI, toString } for Stream global;
 
 function s(string memory contents) pure returns (Stream stream) {
   _Stream memory _stream;
@@ -43,31 +45,6 @@ function concat(Stream left, Stream right) pure returns (Stream stream) {
   }
 
   return _wrap(_Stream(a.length + b.length, chunks));
-}
-
-function map(
-  Stream stream,
-  function(bytes2, uint256, bytes memory) view returns (bytes2, uint256, bytes memory) transform
-) view returns (Stream) {
-  _Stream memory _stream = _unwrap(stream);
-  for (uint256 i = 0; i < _stream.chunks.length; i++) {
-    (bytes2 kind, uint256 length, bytes memory data) =
-      transform(_stream.chunks[i].kind, _stream.chunks[i].length, _stream.chunks[i].data);
-    _stream.chunks[i].kind = kind;
-    _stream.chunks[i].length = length;
-    _stream.chunks[i].data = data;
-  }
-  return _wrap(_stream);
-}
-
-function toString(Stream stream, function(bytes2, uint256, bytes memory) view returns (string memory) transform)
-  view
-  returns (string memory out)
-{
-  _Stream memory _stream = _unwrap(stream);
-  for (uint256 i = 0; i < _stream.chunks.length; i++) {
-    out = string.concat(out, transform(_stream.chunks[i].kind, _stream.chunks[i].length, _stream.chunks[i].data));
-  }
 }
 
 //--------------------//  INTERNAL  //--------------------//
