@@ -2,6 +2,9 @@
 pragma solidity ^0.8.24;
 
 import { Stream, _Stream, _unwrap, _wrap } from "./Stream.sol";
+import { DynamicBufferLib } from "domsol-solady/utils/DynamicBufferLib.sol";
+
+using DynamicBufferLib for DynamicBufferLib.DynamicBuffer;
 
 function map(
   Stream stream,
@@ -20,10 +23,12 @@ function map(
 
 function buildString(Stream stream, function(bytes2, uint256, bytes memory) view returns (string memory) transform)
   view
-  returns (string memory out)
+  returns (string memory)
 {
+  DynamicBufferLib.DynamicBuffer memory buffer;
   _Stream memory _stream = _unwrap(stream);
   for (uint256 i = 0; i < _stream.chunks.length; i++) {
-    out = string.concat(out, transform(_stream.chunks[i].kind, _stream.chunks[i].length, _stream.chunks[i].data));
+    buffer.p(bytes(transform(_stream.chunks[i].kind, _stream.chunks[i].length, _stream.chunks[i].data)));
   }
+  return buffer.s();
 }
