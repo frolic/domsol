@@ -21,11 +21,15 @@ contract ethfsTest is Test {
     fileStore.createFile("three.min.js", Base64.encode(bytes(vm.readFile("test/data/three.min.js"))));
   }
 
-  function testFile() public view {
+  function testFile() public {
     Stream page = s('<script src="data:text/javascript;base64,') + ethfs("three.min.js") + s('"></script>');
     Stream metadata = s('{"name":"Token","animation_url":"data:text/html,') + page.encodeURI() + s('"}');
     Stream uri = s("data:application/json,") + metadata.encodeURI();
 
-    assertEq(bytes(uri.toString()).length, 810588);
+    vm.startSnapshotGas("build token URI with EthFS file");
+    string memory out = uri.toString();
+    vm.stopSnapshotGas("build token URI with EthFS file");
+
+    assertEq(bytes(out).length, 810588);
   }
 }
