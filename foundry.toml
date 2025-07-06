@@ -6,6 +6,7 @@ test = "src"
 script = "script"
 solc = "0.8.24"
 isolate = true
+fs_permissions = [{ access = "read", path = "./"}]
 
 [fmt]
 tab_width = 2
