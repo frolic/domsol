@@ -1,17 +1,17 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
 
-import { LibString } from "domsol-solady/utils/LibString.sol";
+import { LibString } from "strand~solady/utils/LibString.sol";
 
-import { Stream } from "./Stream.sol";
+import { Strand } from "./Strand.sol";
 import { buildString, map } from "./utils.sol";
 
-function encodeURI(Stream stream) view returns (Stream) {
-  return map(stream, _encodeURI);
+function encodeURI(Strand strand) view returns (Strand) {
+  return map(strand, _encodeURI);
 }
 
-function toString(Stream stream) view returns (string memory) {
-  return buildString(stream, _toString);
+function toString(Strand strand) view returns (string memory) {
+  return buildString(strand, _toString);
 }
 
 //--------------------//  INTERNAL  //--------------------//

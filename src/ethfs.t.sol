@@ -3,14 +3,14 @@ pragma solidity ^0.8.24;
 
 import "forge-std/Test.sol";
 
-import { Base64 } from "domsol-solady/utils/Base64.sol";
-import { LibString } from "domsol-solady/utils/LibString.sol";
+import { Base64 } from "strand~solady/utils/Base64.sol";
+import { LibString } from "strand~solady/utils/LibString.sol";
 
 import { File } from "ethfs/src/File.sol";
 import { FileStore } from "ethfs/src/FileStore.sol";
 import { SAFE_SINGLETON_FACTORY, SAFE_SINGLETON_FACTORY_BYTECODE } from "ethfs/test/safeSingletonFactory.sol";
 
-import { Stream, bytecode, s } from "../src/Stream.sol";
+import { Strand, bytecode, s } from "../src/Strand.sol";
 import { ethfs, fileStore } from "./ethfs.sol";
 
 contract ethfsTest is Test {
@@ -21,9 +21,9 @@ contract ethfsTest is Test {
   }
 
   function testFile() public {
-    Stream page = s('<script src="data:text/javascript;base64,') + ethfs("three.min.js") + s('"></script>');
-    Stream metadata = s('{"name":"Token","animation_url":"data:text/html,') + page.encodeURI() + s('"}');
-    Stream uri = s("data:application/json,") + metadata.encodeURI();
+    Strand page = s('<script src="data:text/javascript;base64,') + ethfs("three.min.js") + s('"></script>');
+    Strand metadata = s('{"name":"Token","animation_url":"data:text/html,') + page.encodeURI() + s('"}');
+    Strand uri = s("data:application/json,") + metadata.encodeURI();
 
     vm.startSnapshotGas("build token URI with EthFS file");
     string memory out = uri.toString();

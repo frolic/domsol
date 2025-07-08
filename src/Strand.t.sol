@@ -3,29 +3,29 @@ pragma solidity ^0.8.24;
 
 import "forge-std/Test.sol";
 
-import { Base64 } from "domsol-solady/utils/Base64.sol";
-import { LibString } from "domsol-solady/utils/LibString.sol";
-import { SSTORE2 } from "domsol-solady/utils/SSTORE2.sol";
+import { Base64 } from "strand~solady/utils/Base64.sol";
+import { LibString } from "strand~solady/utils/LibString.sol";
+import { SSTORE2 } from "strand~solady/utils/SSTORE2.sol";
 
-import { Stream, bytecode, s } from "./Stream.sol";
+import { Strand, bytecode, s } from "./Strand.sol";
 
-contract StreamTest is Test {
+contract StrandTest is Test {
   function testString() public view {
-    Stream out = s("hello");
+    Strand out = s("hello");
     assertEq(out.toString(), "hello");
   }
 
   function testConcat() public view {
-    Stream out = (s("hello") + s("world"));
+    Strand out = (s("hello") + s("world"));
     assertEq(out.toString(), "helloworld");
   }
 
   function testTokenURI() public {
     address script = SSTORE2.write(bytes(Base64.encode('alert("hello world")')));
 
-    Stream page = s('<script src="data:text/javascript;base64,') + bytecode(script, 1) + s('"></script>');
-    Stream metadata = s('{"name":"Token","animation_url":"data:text/html,') + page.encodeURI() + s('"}');
-    Stream uri = s("data:application/json,") + metadata.encodeURI();
+    Strand page = s('<script src="data:text/javascript;base64,') + bytecode(script, 1) + s('"></script>');
+    Strand metadata = s('{"name":"Token","animation_url":"data:text/html,') + page.encodeURI() + s('"}');
+    Strand uri = s("data:application/json,") + metadata.encodeURI();
 
     assertEq(
       uri.toString(),

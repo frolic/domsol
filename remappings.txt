@@ -1,4 +1,4 @@
 ethfs/=lib/ethfs/packages/contracts/
 solady/=lib/ethfs/packages/contracts/lib/solady/src/
 
-domsol-solady/=lib/solady/src/
+strand~solady/=lib/solady/src/
