@@ -4,7 +4,8 @@
   "version": "0.0.1",
   "description": "simpler solidity strings",
   "files": [
-    "src/**/*.sol"
+    "src",
+    "lib"
   ],
   "repository": {
     "type": "git",
