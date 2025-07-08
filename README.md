@@ -1,0 +1,3 @@
+# Strand
+
+easier solidity strings
