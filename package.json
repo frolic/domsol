@@ -1,0 +1,13 @@
+{
+  "name": "strand",
+  "license": "MIT",
+  "version": "0.0.1",
+  "description": "simpler solidity strings",
+  "files": [
+    "src/**/*.sol"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/frolic/strand.git"
+  }
+}
